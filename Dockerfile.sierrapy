@@ -1,0 +1,30 @@
+FROM debian:latest
+
+RUN apt-get update
+RUN apt-get -y upgrade
+
+RUN apt-get install -y git make
+RUN apt-get install -y curl bash librust-bzip2-dev g++ gcc bzip2 libc6 libc6-dev zlib1g-dev libncurses-dev libghc-bzlib-dev
+RUN apt-get install -y xz-utils musl-dev cpanminus libperl-dev tzdata
+RUN apt-get install -y libfreetype6 libpng-dev python python-dev python-pip python-setuptools
+RUN apt-get install -y perl libpath-tiny-perl libjson-perl libdata-dumper-concise-perl libfile-slurp-perl libdatetime-perl libdatetime-timezone-perl
+
+RUN pip install gql==0.1.0 graphql-core==0.5.3 promise==0.4.2 requests==2.11.1 six==1.10.0 tqdm==4.8.4 click==6.7 voluptuous==0.10.5
+RUN pip wheel sierrapy
+RUN pip install sierrapy
+
+WORKDIR /usr/local/bin
+RUN cpanm --no-wget IPC::System::Simple
+RUN cpanm --no-wget RTF::Writer
+
+RUN curl -fsSL 'https://raw.githubusercontent.com/connor-lab/singularity-recipes/master/scripts/buildreport.pl' -o /usr/local/bin/buildreport.pl
+RUN chmod 775 /usr/local/bin/buildreport.pl
+
+RUN curl -fsSL 'https://raw.githubusercontent.com/connor-lab/singularity-recipes/master/scripts/phw.jpg' -o /usr/local/bin/phw.jpg
+
+ENV export TZ=Europe/London#
+    
+ENTRYPOINT exec sierrapy "$@"
+
+LABEL Maintainer m-bull n-pacchiarini
+LABEL Version sierappy

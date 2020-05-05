@@ -1,0 +1,52 @@
+FROM debian:latest
+
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install bash bzip2 g++ gcc libc6-dev make libncurses-dev openjdk-11-jdk perl wget xz-utils libghc-bzlib-dev unzip zlib1g-dev liblzma-dev
+RUN apt-get -y install python3 python3-dev python3-pip python3-setuptools cython python3-pysam
+
+RUN wget https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2 -O /tmp/samtools.tar.bz2
+WORKDIR /tmp
+RUN tar xvjf samtools.tar.bz2
+WORKDIR samtools-1.9
+RUN ./configure
+RUN make
+RUN make install
+
+RUN wget 'https://downloads.sourceforge.net/project/smalt/smalt-0.7.6-static.tar.gz' -O /tmp/smalt-0.7.6-static.tar.gz
+WORKDIR /tmp
+RUN tar xvzf smalt-0.7.6-static.tar.gz
+WORKDIR smalt-0.7.6
+RUN ./configure
+RUN make
+RUN make install
+
+RUN wget https://github.com/refresh-bio/KMC/releases/download/v3.1.0/KMC3.1.0.linux.tar.gz -O /tmp/KMC3.1.0.linux.tar.gz
+WORKDIR /tmp
+RUN tar xvzf KMC3.1.0.linux.tar.gz
+RUN mv kmc* /usr/local/bin
+
+RUN wget https://github.com/tcsh-org/tcsh/archive/cvs2git-20170131.tar.gz -O /tmp/cvs2git-20170131.tar.gz
+WORKDIR /tmp
+RUN tar xvzf cvs2git-20170131.tar.gz tcsh-cvs2git-20170131
+WORKDIR tcsh-cvs2git-20170131
+RUN ./configure
+RUN make
+RUN make install
+RUN ln -s /usr/local/bin/tcsh /usr/local/bin/csh
+
+RUN wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.38.zip -O /usr/local/bin/Trimmomatic-0.38.zip
+WORKDIR /usr/local/bin
+RUN unzip Trimmomatic-0.38.zip
+RUN ln -s /usr/local/bin/Trimmomatic-0.38/trimmomatic-0.38.jar /usr/local/bin
+
+RUN wget https://downloads.sourceforge.net/project/mummer/mummer/3.23/MUMmer3.23.tar.gz -O /usr/local/bin/MUMmer3.23.tar.gz
+WORKDIR /usr/local/bin
+RUN tar xvzf MUMmer3.23.tar.gz
+WORKDIR /usr/local/bin/MUMmer3.23
+RUN make && make install
+
+ENV PATH=$PATH:/usr/local/bin/MUMmer3.23
+ENV export PATH
+
+RUN pip3 install iva

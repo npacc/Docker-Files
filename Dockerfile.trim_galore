@@ -1,0 +1,23 @@
+FROM debian:latest
+
+RUN apt-get update
+RUN apt-get -y upgrade
+RUN apt-get -y install git make
+RUN apt-get -y install bash curl gcc g++ bzip2 libc6-dev libncurses-dev xz-utils zlib1g-dev unzip
+RUN apt-get -y install openjdk-11-jre ttf-dejavu
+RUN apt-get -y install perl python2 python-dev python-pip
+
+RUN pip install cutadapt
+
+WORKDIR /usr/local/bin
+RUN curl -fsSL "https://www.bioinformatics.babraham.ac.uk/projects/fastqc/fastqc_v0.11.8.zip" -o fastqc_v0.11.8.zip
+RUN unzip fastqc_v0.11.8.zip
+RUN find /usr/local/bin/FastQC -name "fastqc" -maxdepth 1 -exec chmod +x {} \;
+RUN find /usr/local/bin/FastQC -name "fastqc" -maxdepth 1 -perm /u+x -exec ln -s {} /usr/local/bin \;
+
+WORKDIR /usr/local/bin
+RUN curl -fsSL "https://github.com/FelixKrueger/TrimGalore/archive/0.5.0.tar.gz" | tar -xz
+RUN find /usr/local/bin/ -name "trim_galore" -exec ln -s {} /usr/local/bin \;
+
+LABEL Maintainer m-bull a-gaskin n-pacchiarini
+LABEL Version trim_galore-0.5.0 
